@@ -25,10 +25,13 @@ import android.widget.Toast;
 
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements TextToSpeech.OnInitListener {
+public class MainActivity extends AppCompatActivity /*implements TextToSpeech.OnInitListener*/ {
 
     TextToSpeech textToSpeech;
     String number ;
+    Intent intent;
+    IntentFilter filter;
+    BroadcastReceiver mReceiver;
 
     @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
@@ -65,26 +68,41 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             }
         }
 
+        //textToSpeech = new TextToSpeech(this, this);
+        filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
+        mReceiver = new PhoneCallReceiver();
+        registerReceiver(mReceiver, filter);
+        intent = new Intent(getApplicationContext(), PhoneCallReceiver.class);
+        sendBroadcast(intent);
+
         AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
         audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
 
-        textToSpeech = new TextToSpeech(this, this);
-
-        TelephonyManager telephony = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
-        telephony.listen(new PhoneStateListener() {
-            public void onCallStateChanged(int state, String incomingNumber) {
-                super.onCallStateChanged(state, incomingNumber);
-                // not getting incoming number in latest version of android
-                    //state=TelephonyManager.CALL_STATE_RINGING;
-                    //speak();
-                    number = incomingNumber;
-                    System.out.println("incomingNumberA1 : " + incomingNumber);
-            }
-        }, PhoneStateListener.LISTEN_CALL_STATE);
-
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sendBroadcast(intent);
+        registerReceiver(mReceiver, filter);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        sendBroadcast(intent);
+        registerReceiver(mReceiver, filter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        sendBroadcast(intent);
+        registerReceiver(mReceiver, filter);
+    }
+
+    /*@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onInit(int status) {
         if (status == TextToSpeech.SUCCESS) {
@@ -99,19 +117,16 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void speak() {
-        System.out.println("WORKING  :=== " + Constant.IncomingNumber);
-        if(number == null) {
-            number = Constant.IncomingNumber;
-            Bundle bundle = new Bundle();
-            bundle.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC);
-            textToSpeech.speak(number, TextToSpeech.QUEUE_FLUSH, bundle, null);
-            System.out.println("N TTS : " + number);
-        } else {
-            Bundle bundle = new Bundle();
-            bundle.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC);
-            textToSpeech.speak(number, TextToSpeech.QUEUE_FLUSH, bundle, null);
-            System.out.println("TTS : " + number);
-        }
+        Bundle bundle = new Bundle();
+        bundle.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC);
+        textToSpeech.speak(number, TextToSpeech.QUEUE_ADD, bundle, null);
+        System.out.println("N TTS : " + number);
     }
+
+    public void onUtteranceCompleted(String utteranceId) {
+        textToSpeech.shutdown();
+        textToSpeech = null;
+        finish();
+    }*/
 
 }
