@@ -49,23 +49,24 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                     1);
         }
 
-        AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-        audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
-
         if (Build.VERSION.SDK_INT < 23) {
+            AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
             audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
         } else if( Build.VERSION.SDK_INT >= 23 ) {
             NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
             // if user granted access else ask for permission
             if ( notificationManager.isNotificationPolicyAccessGranted()) {
+                AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
                 audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
             } else{
                 // Open Setting screen to ask for permisssion
                 Intent intent = new Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
-                startActivityForResult( intent, 1 );
+                startActivityForResult( intent, 0 );
             }
         }
+
+        AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
 
         textToSpeech = new TextToSpeech(this, this);
 
@@ -74,12 +75,10 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
             public void onCallStateChanged(int state, String incomingNumber) {
                 super.onCallStateChanged(state, incomingNumber);
                 // not getting incoming number in latest version of android
-                if(state == TelephonyManager.CALL_STATE_RINGING) {
                     //state=TelephonyManager.CALL_STATE_RINGING;
-                    speak();
+                    //speak();
                     number = incomingNumber;
                     System.out.println("incomingNumberA1 : " + incomingNumber);
-                }
             }
         }, PhoneStateListener.LISTEN_CALL_STATE);
 
@@ -100,11 +99,19 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void speak() {
-        Log.d("=====MESSAGE=====", "WORKING  " + Constant.IncomingNumber);
-        Bundle bundle = new Bundle();
-        bundle.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC);
-        textToSpeech.speak(number, TextToSpeech.QUEUE_FLUSH, bundle, null);
-        System.out.println("TTS : " + number);
+        System.out.println("WORKING  :=== " + Constant.IncomingNumber);
+        if(number == null) {
+            number = Constant.IncomingNumber;
+            Bundle bundle = new Bundle();
+            bundle.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC);
+            textToSpeech.speak(number, TextToSpeech.QUEUE_FLUSH, bundle, null);
+            System.out.println("N TTS : " + number);
+        } else {
+            Bundle bundle = new Bundle();
+            bundle.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC);
+            textToSpeech.speak(number, TextToSpeech.QUEUE_FLUSH, bundle, null);
+            System.out.println("TTS : " + number);
+        }
     }
 
 }
