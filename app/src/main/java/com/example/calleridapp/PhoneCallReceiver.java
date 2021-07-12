@@ -24,7 +24,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import java.util.HashMap;
 import java.util.Locale;
 
-public class PhoneCallReceiver extends BroadcastReceiver implements TextToSpeech.OnInitListener {
+public class PhoneCallReceiver extends BroadcastReceiver /*implements TextToSpeech.OnInitListener*/ {
 
     TextToSpeech textToSpeech;
     String phoneIncomingNumber = "0";
@@ -33,17 +33,16 @@ public class PhoneCallReceiver extends BroadcastReceiver implements TextToSpeech
     @Override
     public void onReceive(Context context, Intent intent) {
         String stateStr = intent.getExtras().getString(TelephonyManager.EXTRA_STATE);
-        //number = intent.getExtras().getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
-        //Constant.IncomingNumber = number;
+
         TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-        phoneIncomingNumber = intent.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
-        String phoneOutgoingNumber = intent.getStringExtra(Intent.EXTRA_PHONE_NUMBER);
+
         telephonyManager.listen(new PhoneStateListener(){
             @Override
             public void onCallStateChanged(int state, String incomingNumber) {
                 super.onCallStateChanged(state, incomingNumber);
 
-                String phoneNr= intent.getStringExtra("incoming_number");
+                Constant.IncomingNumber = incomingNumber;
+                phoneIncomingNumber = incomingNumber;
                 if(state == (TelephonyManager.CALL_STATE_IDLE)) {
                     //state = TelephonyManager.CALL_STATE_IDLE;
                     showToast(context, "Call Ended "+incomingNumber);
@@ -52,34 +51,21 @@ public class PhoneCallReceiver extends BroadcastReceiver implements TextToSpeech
                     showToast(context, "Calling or Connected "+incomingNumber);
                 } else  if(state == (TelephonyManager.CALL_STATE_RINGING)) {
                     //state=TelephonyManager.CALL_STATE_RINGING;
-                    showToast(context, "Ringing "+phoneNr);
+                    showToast(context, "Ringing "+incomingNumber);
+                    //speak();
                 }
-                System.out.println("incomingNumber : "+incomingNumber+" = "+ phoneIncomingNumber+ "="+ phoneOutgoingNumber);
+                System.out.println("incomingNumber : "+incomingNumber);
             }
         },PhoneStateListener.LISTEN_CALL_STATE);
 
-        /*if(stateStr.equals(TelephonyManager.EXTRA_STATE_IDLE)) {
-            //state = TelephonyManager.CALL_STATE_IDLE;
-            showToast(context, "Call Ended "+phoneIncomingNumber);
-        } else if(stateStr.equals(TelephonyManager.EXTRA_STATE_OFFHOOK)) {
-            //state = TelephonyManager.CALL_STATE_OFFHOOK;
-            showToast(context, "Calling or Connected "+phoneIncomingNumber);
-        } else  if(stateStr.equals(TelephonyManager.EXTRA_STATE_RINGING)) {
-            //state=TelephonyManager.CALL_STATE_RINGING;
-            showToast(context, "Ringing "+phoneIncomingNumber);
-        }
-
-        /*Intent i = new Intent("custom-message");
-        i.putExtra("number", number);
-        context.sendBroadcast(i);*/
     }
 
     public void showToast(Context context, String s) {
-        Toast.makeText(context, s, Toast.LENGTH_LONG).show();
+        Toast.makeText(context, s, Toast.LENGTH_SHORT).show();
     }
 
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    /*@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onInit(int status) {
         if (status == TextToSpeech.SUCCESS) {
@@ -87,7 +73,7 @@ public class PhoneCallReceiver extends BroadcastReceiver implements TextToSpeech
             textToSpeech.setPitch(1);
             textToSpeech.setSpeechRate(1);
             if (result != TextToSpeech.ERROR) {
-                speak();
+               // speak();
             }
         }
     }
@@ -98,5 +84,5 @@ public class PhoneCallReceiver extends BroadcastReceiver implements TextToSpeech
         bundle.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC);
         textToSpeech.speak(phoneIncomingNumber, TextToSpeech.QUEUE_FLUSH, bundle, null);
         Log.d("=====BR-MSG=====", "WORKING , "+phoneIncomingNumber);
-    }
+    }*/
 }
