@@ -22,7 +22,7 @@ public class BackgroundService extends Service implements TextToSpeech.OnInitLis
     @Override
     public void onStart(Intent intent, int startId) {
         super.onStart(intent, startId);
-        number = intent.getStringExtra("number");
+        number = intent.getExtras().getString("number");
     }
 
     @Override
@@ -40,8 +40,8 @@ public class BackgroundService extends Service implements TextToSpeech.OnInitLis
     private void speak() {
         Bundle bundle = new Bundle();
         bundle.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC);
-        textToSpeech.speak(number, TextToSpeech.QUEUE_ADD, bundle, null);
-        System.out.println("TTS : " + number);
+        textToSpeech.speak(number, TextToSpeech.QUEUE_FLUSH, bundle, null);
+        System.out.println("BG_TTS : " + number);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)

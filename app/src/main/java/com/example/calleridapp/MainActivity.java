@@ -25,10 +25,8 @@ import android.widget.Toast;
 
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity /*implements TextToSpeech.OnInitListener*/ {
+public class MainActivity extends AppCompatActivity  {
 
-    TextToSpeech textToSpeech;
-    String number ;
     Intent intent;
     IntentFilter filter;
     BroadcastReceiver mReceiver;
@@ -68,7 +66,6 @@ public class MainActivity extends AppCompatActivity /*implements TextToSpeech.On
             }
         }
 
-        //textToSpeech = new TextToSpeech(this, this);
         filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
         filter.addAction(Intent.ACTION_SCREEN_OFF);
         mReceiver = new PhoneCallReceiver();
@@ -76,8 +73,6 @@ public class MainActivity extends AppCompatActivity /*implements TextToSpeech.On
         intent = new Intent(getApplicationContext(), PhoneCallReceiver.class);
         sendBroadcast(intent);
 
-        AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
 
     }
 
@@ -101,32 +96,5 @@ public class MainActivity extends AppCompatActivity /*implements TextToSpeech.On
         sendBroadcast(intent);
         registerReceiver(mReceiver, filter);
     }
-
-    /*@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    @Override
-    public void onInit(int status) {
-        if (status == TextToSpeech.SUCCESS) {
-            int result = textToSpeech.setLanguage(Locale.US);
-            textToSpeech.setPitch(1);
-            textToSpeech.setSpeechRate(1);
-            if (result != TextToSpeech.ERROR) {
-                speak();
-            }
-        }
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void speak() {
-        Bundle bundle = new Bundle();
-        bundle.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC);
-        textToSpeech.speak(number, TextToSpeech.QUEUE_ADD, bundle, null);
-        System.out.println("N TTS : " + number);
-    }
-
-    public void onUtteranceCompleted(String utteranceId) {
-        textToSpeech.shutdown();
-        textToSpeech = null;
-        finish();
-    }*/
 
 }

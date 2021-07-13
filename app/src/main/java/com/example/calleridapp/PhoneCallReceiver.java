@@ -31,9 +31,8 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import java.util.HashMap;
 import java.util.Locale;
 
-public class PhoneCallReceiver extends BroadcastReceiver /*implements TextToSpeech.OnInitListener*/ {
+public class PhoneCallReceiver extends BroadcastReceiver  {
 
-    TextToSpeech textToSpeech;
     String number ;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -52,9 +51,6 @@ public class PhoneCallReceiver extends BroadcastReceiver /*implements TextToSpee
             }
         }
 
-        AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-
         TelephonyManager telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 
         telephonyManager.listen(new PhoneStateListener(){
@@ -64,47 +60,35 @@ public class PhoneCallReceiver extends BroadcastReceiver /*implements TextToSpee
                 super.onCallStateChanged(state, incomingNumber);
 
                 number = incomingNumber;
+
                 if(state == (TelephonyManager.CALL_STATE_IDLE)) {
                     //state = TelephonyManager.CALL_STATE_IDLE;
                     showToast(context, "Call Ended "+incomingNumber);
-                } else if(state == (TelephonyManager.CALL_STATE_OFFHOOK)) {
+                    AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+                    audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                }
+                if(state == (TelephonyManager.CALL_STATE_OFFHOOK)) {
                     //state = TelephonyManager.CALL_STATE_OFFHOOK;
                     showToast(context, "Calling or Connected "+incomingNumber);
-                } else  if(state == (TelephonyManager.CALL_STATE_RINGING)) {
+                    AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+                    audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                }
+                if(state == (TelephonyManager.CALL_STATE_RINGING)) {
                     //state=TelephonyManager.CALL_STATE_RINGING;
                     showToast(context, "Ringing "+incomingNumber);
+                    AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+                    audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
                     Intent i = new Intent(context, BackgroundService.class);
                     i.putExtra("number", number);
                     i.addFlags(Intent.FLAG_FROM_BACKGROUND | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS
                     | Intent.FLAG_RECEIVER_FOREGROUND);
-                    context.startService(i);
+                    context.startForegroundService(i);
                 }
-                System.out.println("incomingNumber : "+incomingNumber);
+                System.out.println("BG_incomingNumber : "+incomingNumber);
             }
         },PhoneStateListener.LISTEN_CALL_STATE);
 
     }
-
-    /*@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void speak() {
-        Bundle bundle = new Bundle();
-        bundle.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC);
-        textToSpeech.speak(number, TextToSpeech.QUEUE_ADD, bundle, null);
-        System.out.println("TTS : " + number);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    @Override
-    public void onInit(int status) {
-        if (status == TextToSpeech.SUCCESS) {
-            int result = textToSpeech.setLanguage(Locale.US);
-            textToSpeech.setPitch(1);
-            textToSpeech.setSpeechRate(1);
-            if (result != TextToSpeech.ERROR) {
-                speak();
-            }
-        }
-    }*/
 
     public void showToast(Context context, String s) {
         Toast.makeText(context, s, Toast.LENGTH_SHORT).show();
