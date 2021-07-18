@@ -21,6 +21,8 @@ import android.speech.tts.TextToSpeech;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import java.util.Locale;
@@ -28,8 +30,8 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity  {
 
     Intent intent;
-    IntentFilter filter;
-    BroadcastReceiver mReceiver;
+    Button start, stop;
+
 
     @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
@@ -50,7 +52,26 @@ public class MainActivity extends AppCompatActivity  {
                     1);
         }
 
-        if (Build.VERSION.SDK_INT < 23) {
+        start = findViewById(R.id.start);
+        stop = findViewById(R.id.stop);
+
+        start.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startService(new Intent(MainActivity.this, BackgroundService.class));
+                showToast(getApplicationContext(), "Service Started");
+            }
+        });
+
+        stop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopService(new Intent(MainActivity.this, BackgroundService.class));
+                showToast(getApplicationContext(), "Service Stopped");
+            }
+        });
+
+        /*if (Build.VERSION.SDK_INT < 23) {
             AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
             audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
         } else if( Build.VERSION.SDK_INT >= 23 ) {
@@ -64,37 +85,13 @@ public class MainActivity extends AppCompatActivity  {
                 Intent intent = new Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
                 startActivityForResult( intent, 0 );
             }
-        }
-
-        filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
-        filter.addAction(Intent.ACTION_SCREEN_OFF);
-        mReceiver = new PhoneCallReceiver();
-        registerReceiver(mReceiver, filter);
-        intent = new Intent(getApplicationContext(), PhoneCallReceiver.class);
-        sendBroadcast(intent);
+        }*/
 
 
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        sendBroadcast(intent);
-        registerReceiver(mReceiver, filter);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        sendBroadcast(intent);
-        registerReceiver(mReceiver, filter);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        sendBroadcast(intent);
-        registerReceiver(mReceiver, filter);
+    public void showToast(Context context, String s) {
+        Toast.makeText(context, s, Toast.LENGTH_SHORT).show();
     }
 
 }
