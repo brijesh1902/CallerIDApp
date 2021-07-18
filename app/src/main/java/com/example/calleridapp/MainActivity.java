@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.Manifest;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -29,9 +30,7 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity  {
 
-    Intent intent;
     Button start, stop;
-
 
     @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
@@ -55,10 +54,21 @@ public class MainActivity extends AppCompatActivity  {
         start = findViewById(R.id.start);
         stop = findViewById(R.id.stop);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel("channel", "Example", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(channel);
+        }
+
         start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startService(new Intent(MainActivity.this, BackgroundService.class));
+                Intent startIntent = new Intent(getApplicationContext(), BackgroundService.class);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    startForegroundService(startIntent);
+                } else {
+                    startService(startIntent);
+                }
                 showToast(getApplicationContext(), "Service Started");
             }
         });
@@ -70,23 +80,6 @@ public class MainActivity extends AppCompatActivity  {
                 showToast(getApplicationContext(), "Service Stopped");
             }
         });
-
-        /*if (Build.VERSION.SDK_INT < 23) {
-            AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
-            audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-        } else if( Build.VERSION.SDK_INT >= 23 ) {
-            NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
-            // if user granted access else ask for permission
-            if ( notificationManager.isNotificationPolicyAccessGranted()) {
-                AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
-                audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-            } else{
-                // Open Setting screen to ask for permisssion
-                Intent intent = new Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
-                startActivityForResult( intent, 0 );
-            }
-        }*/
-
 
     }
 
