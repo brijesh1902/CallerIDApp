@@ -65,12 +65,12 @@ public class BackgroundService extends Service implements TextToSpeech.OnInitLis
                 if(state == (TelephonyManager.CALL_STATE_IDLE)) {
                     //state = TelephonyManager.CALL_STATE_IDLE;
                     showToast(getApplicationContext(), "Call Ended "+incomingNumber);
-                    audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_UNMUTE, 5);
                 }
                 if(state == (TelephonyManager.CALL_STATE_OFFHOOK)) {
                     //state = TelephonyManager.CALL_STATE_OFFHOOK;
                     showToast(getApplicationContext(), "Calling or Connected "+incomingNumber);
-                    audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+                    audioManager.adjustStreamVolume(AudioManager.STREAM_RING, AudioManager.ADJUST_UNMUTE, 5);
                 }
                 if(state == (TelephonyManager.CALL_STATE_RINGING)) {
                     //state=TelephonyManager.CALL_STATE_RINGING;
@@ -100,17 +100,11 @@ public class BackgroundService extends Service implements TextToSpeech.OnInitLis
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void speak() {
-        String tts_value = number+" "+number+" "+number+" "+number;
+        String tts_value = "Calling "+number+" "+number+" "+number+" "+number;
         Bundle bundle = new Bundle();
-        bundle.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.FLAG_PLAY_SOUND);
+        bundle.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC);
         textToSpeech.speak(tts_value , TextToSpeech.QUEUE_FLUSH, bundle, null);
         System.out.println("BG_TTS : " + number);
-        /*textToSpeech.speak(number, TextToSpeech.QUEUE_ADD, bundle, null);
-        System.out.println("BG_TTS 1: " + number);
-        textToSpeech.speak(number, TextToSpeech.QUEUE_ADD, bundle, null);
-        System.out.println("BG_TTS 2: " + number);
-        textToSpeech.speak(number, TextToSpeech.QUEUE_ADD, bundle, null);
-        System.out.println("BG_TTS 3: " + number);*/
     }
 
     @Override
