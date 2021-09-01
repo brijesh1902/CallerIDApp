@@ -21,6 +21,16 @@ android {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+
+        applicationVariants.all{
+            variant->
+                variant.outputs.each{
+                    output->
+                        def name = "Caller_ID_v-${variant.versionName}.apk"
+                        output.outputFileName=name;
+                }
+        }
+
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
