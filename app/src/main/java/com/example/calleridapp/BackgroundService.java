@@ -54,7 +54,7 @@ public class BackgroundService extends Service implements TextToSpeech.OnInitLis
                 .build();
 
         startForeground(1, notification);
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
 
@@ -140,7 +140,7 @@ public class BackgroundService extends Service implements TextToSpeech.OnInitLis
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+   /* @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void speakName() {
         String tts_value = "Calling "+Name+" "+Name+" "+Name+" "+Name;
         Bundle bundle = new Bundle();
@@ -158,7 +158,7 @@ public class BackgroundService extends Service implements TextToSpeech.OnInitLis
         textToSpeech.speak(tts_value , TextToSpeech.QUEUE_FLUSH, bundle, null);
         System.out.println("number BG_TTS : " + tts_value);
 
-    }
+    }*/
 
     @Override
     public void onDestroy() {
